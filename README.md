@@ -44,7 +44,7 @@ print(f'音频数据：{audio_segment.samples}')
 
 <br/>
 
-> def `__init__`(self, samples, sample_rate):
+> **def `__init__`(self, samples, sample_rate):**
 
 创建单通道音频片段实例
 
@@ -55,7 +55,7 @@ print(f'音频数据：{audio_segment.samples}')
 
 <br/>
 
-> def `__eq__`(self, other):
+> **def `__eq__`(self, other):**
 
 返回两个对象是否相等
 
@@ -65,7 +65,7 @@ print(f'音频数据：{audio_segment.samples}')
 
 <br/>
 
-> def `__ne__`(self, other):
+> **def `__ne__`(self, other):**
 
 返回两个实例是否不相等
 
@@ -75,13 +75,13 @@ print(f'音频数据：{audio_segment.samples}')
 
 <br/>
 
-> def `__str__`(self):
+> **def `__str__`(self):**
 
 返回该音频的信息
 
 <br/>
 
-> def from_file(cls, file):
+> **def from_file(cls, file):**
 
 从音频文件创建音频段，支持wav、mp3、mp4等多种音频格式
 
@@ -95,7 +95,7 @@ print(f'音频数据：{audio_segment.samples}')
 
 <br/>
 
-> def slice_from_file(cls, file, start=None, end=None):
+> **def slice_from_file(cls, file, start=None, end=None):**
 
 只加载一小段音频，而不需要将整个文件加载到内存中，这是非常浪费的。
 
@@ -115,7 +115,7 @@ print(f'音频数据：{audio_segment.samples}')
 
 <br/>
 
-> def from_bytes(cls, data):
+> **def from_bytes(cls, data):**
 
 从wav格式的音频字节创建音频段
 
@@ -129,7 +129,7 @@ print(f'音频数据：{audio_segment.samples}')
 
 <br/>
 
-> def from_pcm_bytes(cls, data, channels=1, samp_width=2, sample_rate=16000):
+> **def from_pcm_bytes(cls, data, channels=1, samp_width=2, sample_rate=16000):**
 
 从包含无格式PCM音频的字节创建音频
 
@@ -146,7 +146,7 @@ print(f'音频数据：{audio_segment.samples}')
 
 <br/>
 
-> def from_ndarray(cls, data, sample_rate=16000):
+> **def from_ndarray(cls, data, sample_rate=16000):**
 
 从numpy.ndarray创建音频段
 
@@ -161,7 +161,7 @@ print(f'音频数据：{audio_segment.samples}')
 
 <br/>
 
-> def concatenate(cls, *segments):
+> **def concatenate(cls, \*segments):**
 
 将任意数量的音频片段连接在一起
 
