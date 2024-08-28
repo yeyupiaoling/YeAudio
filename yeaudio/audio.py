@@ -184,7 +184,7 @@ class AudioSegment(object):
         :param duration: 静音的时间，以秒为单位
         :type duration: float
         :param sample_rate: 音频采样率
-        :type sample_rate: float
+        :type sample_rate: int
         :return: 给定持续时间的静音AudioSegment实例
         :rtype: AudioSegment
         """

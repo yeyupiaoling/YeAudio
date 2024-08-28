@@ -42,7 +42,9 @@ print(f'音频数据：{audio_segment.samples}')
 
 # API文档
 
-> def __init__(self, samples, sample_rate):
+<br/>
+
+> def `__init__`(self, samples, sample_rate):
 
 创建单通道音频片段实例
 
@@ -51,8 +53,9 @@ print(f'音频数据：{audio_segment.samples}')
  - **samples（ndarray.float32）：** 频数据，维度为[num_samples x num_channels]
  - **sample_rate（int）：** 音频的采样率
 
+<br/>
 
-> def __eq__(self, other):
+> def `__eq__`(self, other):
 
 返回两个对象是否相等
 
@@ -60,8 +63,9 @@ print(f'音频数据：{audio_segment.samples}')
 
  - **other（AudioSegment）：** 比较的另一个音频片段实例
 
+<br/>
 
-> def __ne__(self, other):
+> def `__ne__`(self, other):
 
 返回两个实例是否不相等
 
@@ -69,11 +73,13 @@ print(f'音频数据：{audio_segment.samples}')
 
  - **other（AudioSegment）：** 比较的另一个音频片段实例
 
+<br/>
 
-> def __str__(self):
+> def `__str__`(self):
 
 返回该音频的信息
 
+<br/>
 
 > def from_file(cls, file):
 
@@ -87,6 +93,7 @@ print(f'音频数据：{audio_segment.samples}')
 
  - `AudioSegment`：音频片段实例
 
+<br/>
 
 > def slice_from_file(cls, file, start=None, end=None):
 
@@ -106,6 +113,7 @@ print(f'音频数据：{audio_segment.samples}')
 
  - `ValueError`：如果开始或结束的设定不正确，则会抛出ValueError异常
 
+<br/>
 
 > def from_bytes(cls, data):
 
@@ -119,6 +127,7 @@ print(f'音频数据：{audio_segment.samples}')
 
  - `AudioSegment`：音频片段实例
 
+<br/>
 
 > def from_pcm_bytes(cls, data, channels=1, samp_width=2, sample_rate=16000):
 
@@ -135,6 +144,7 @@ print(f'音频数据：{audio_segment.samples}')
 
  - `AudioSegment`：音频片段实例
 
+<br/>
 
 > def from_ndarray(cls, data, sample_rate=16000):
 
@@ -149,6 +159,7 @@ print(f'音频数据：{audio_segment.samples}')
 
  - `AudioSegment`：音频片段实例
 
+<br/>
 
 > def concatenate(cls, *segments):
 
