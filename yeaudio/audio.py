@@ -14,19 +14,13 @@ from yeaudio.utils.av_utils import buf_to_float, decode_audio
 
 
 class AudioSegment(object):
-    """Monaural audio segment abstraction.
-
-    :param samples: Audio samples [num_samples x num_channels].
-    :type samples: ndarray.float32
-    :param sample_rate: Audio sample rate.
-    :type sample_rate: int
-    :raises TypeError: If the sample data type is not float or int.
-    """
-
     def __init__(self, samples, sample_rate):
-        """Create audio segment from samples.
+        """创建单通道音频片段实例
 
-        Samples are convert float32 internally, with int scaled to [-1, 1].
+        :param samples: 音频数据，维度为[num_samples x num_channels]
+        :type samples: ndarray.float32
+        :param sample_rate: 音频的采样率
+        :type sample_rate: int
         """
         self.vad_model = None
         self._samples = self._convert_samples_to_float32(samples)
@@ -35,29 +29,37 @@ class AudioSegment(object):
             self._samples = np.mean(self._samples, 1)
 
     def __eq__(self, other):
-        """返回两个对象是否相等"""
+        """返回两个实例是否相等
+
+        :param other: 比较的另一个音频片段实例
+        :type other: AudioSegment
+        """
         if type(other) is not type(self):
             return False
-        if self._sample_rate != other._sample_rate:
+        if self.sample_rate != other.sample_rate:
             return False
-        if self._samples.shape != other._samples.shape:
+        if self.samples.shape != other.samples.shape:
             return False
-        if np.any(self.samples != other._samples):
+        if np.any(self.samples != other.samples):
             return False
         return True
 
     def __ne__(self, other):
-        """返回两个对象是否不相等"""
+        """返回两个实例是否不相等
+
+        :param other: 比较的另一个音频片段实例
+        :type other: AudioSegment
+        """
         return not self.__eq__(other)
 
     def __str__(self):
         """返回该音频的信息"""
         return (f"{type(self)}: num_samples={self.num_samples}, sample_rate={self.sample_rate}, "
-                f"duration={self.duration:.2f}sec, rms={self.rms_db:.2f}dB")
+                f"duration={self.duration:.3f}sec, rms={self.rms_db:.2f}dB")
 
     @classmethod
     def from_file(cls, file):
-        """从音频文件创建音频段
+        """从音频文件创建音频段，支持wav、mp3、mp4等多种音频格式
 
         :param file: 文件路径，或者文件对象
         :type file: str, BufferedReader
@@ -84,7 +86,7 @@ class AudioSegment(object):
         :type end: float
         :return: AudioSegment输入音频文件的指定片的实例。
         :rtype: AudioSegment
-        :raise ValueError: 如开始或结束的设定不正确，例如时间不允许。
+        :raise ValueError: 如果开始或结束的设定不正确，则会抛出ValueError异常
         """
         sndfile = soundfile.SoundFile(file)
         sample_rate = sndfile.samplerate
@@ -109,11 +111,11 @@ class AudioSegment(object):
 
     @classmethod
     def from_bytes(cls, data):
-        """从包含音频样本的字节创建音频段
+        """从wav格式的音频字节创建音频段
 
         :param data: 包含音频样本的字节
         :type data: bytes
-        :return: 音频部分实例
+        :return: 音频片段实例
         :rtype: AudioSegment
         """
         samples, sample_rate = soundfile.read(io.BytesIO(data), dtype='float32')
@@ -131,7 +133,7 @@ class AudioSegment(object):
         :type samp_width: int
         :param sample_rate: 音频样本采样率
         :type sample_rate: int
-        :return: 音频部分实例
+        :return: 音频片段实例
         :rtype: AudioSegment
         """
         samples = buf_to_float(data, n_bytes=samp_width)
@@ -147,7 +149,7 @@ class AudioSegment(object):
         :type data: ndarray
         :param sample_rate: 音频样本采样率
         :type sample_rate: int
-        :return: 音频部分实例
+        :return: 音频片段实例
         :rtype: AudioSegment
         """
         return cls(data, sample_rate)
@@ -156,20 +158,19 @@ class AudioSegment(object):
     def concatenate(cls, *segments):
         """将任意数量的音频片段连接在一起
 
-        :param *segments: 输入音频片段被连接
-        :type *segments: tuple of AudioSegment
-        :return: Audio segment instance as concatenating results.
+        :param segments: 输入音频片段被连接
+        :type segments: AudioSegment
+        :return: 拼接后的音频段实例
         :rtype: AudioSegment
-        :raises ValueError: If the number of segments is zero, or if the
-                            sample_rate of any segments does not match.
-        :raises TypeError: If any segment is not AudioSegment instance.
+        :raises ValueError: 如果音频实例列表为空或者采样率不一致，则会抛出ValueError异常
+        :raises TypeError: 如果输入的片段类型不一致，则会抛出TypeError异常
         """
         # Perform basic sanity-checks.
         if len(segments) == 0:
             raise ValueError("没有音频片段被给予连接")
-        sample_rate = segments[0]._sample_rate
+        sample_rate = segments[0].sample_rate
         for seg in segments:
-            if sample_rate != seg._sample_rate:
+            if sample_rate != seg.sample_rate:
                 raise ValueError("能用不同的采样率连接片段")
             if type(seg) is not cls:
                 raise TypeError("只有相同类型的音频片段可以连接")
@@ -195,10 +196,9 @@ class AudioSegment(object):
 
         :param filepath: WAV文件路径或文件对象，以保存音频段
         :type filepath: str|file
-        :param dtype: Subtype for audio file. Options: 'int16', 'int32',
-                      'float32', 'float64'. Default is 'float32'.
+        :param dtype: 音频数据类型，可选: 'int16', 'int32', 'float32', 'float64'
         :type dtype: str
-        :raises TypeError: If dtype is not supported.
+        :raises TypeError: 类型不支持
         """
         samples = self._convert_samples_from_float32(self._samples, dtype)
         subtype_map = {
@@ -224,19 +224,18 @@ class AudioSegment(object):
         """
         if not isinstance(other, type(self)):
             raise TypeError(f"不能添加不同类型的段: {type(self)} 和 {type(other)}")
-        if self._sample_rate != other._sample_rate:
+        if self.sample_rate != other.sample_rate:
             raise ValueError("采样率必须匹配才能添加片段")
-        if len(self._samples) != len(other._samples):
+        if len(self.samples) != len(other.samples):
             raise ValueError("段长度必须匹配才能添加段")
         self._samples += other._samples
 
     def to_bytes(self, dtype='float32'):
         """创建包含音频内容的字节字符串
 
-        :param dtype: Data type for export samples. Options: 'int16', 'int32',
-                      'float32', 'float64'. Default is 'float32'.
+        :param dtype: 导出样本的数据类型。可选: 'int16', 'int32', 'float32', 'float64'.
         :type dtype: str
-        :return: Byte string containing audio content.
+        :return: 包含音频内容的字节字符串
         :rtype: str
         """
         samples = self._convert_samples_from_float32(self._samples, dtype)
@@ -245,8 +244,7 @@ class AudioSegment(object):
     def to(self, dtype='int16'):
         """类型转换
 
-        :param dtype: Data type for export samples. Options: 'int16', 'int32',
-                      'float32', 'float64'. Default is 'float32'.
+        :param dtype: 导出样本的数据类型。可选: 'int16', 'int32', 'float32', 'float64'
         :type dtype: str
         :return: np.ndarray containing `dtype` audio content.
         :rtype: str
@@ -257,9 +255,7 @@ class AudioSegment(object):
     def gain_db(self, gain):
         """对音频施加分贝增益。
 
-        Note that this is an in-place transformation.
-
-        :param gain: Gain in decibels to apply to samples.
+        :param gain: 用于样品的分贝增益
         :type gain: float|1darray
         """
         self._samples *= 10. ** (gain / 20.)
@@ -267,11 +263,11 @@ class AudioSegment(object):
     def change_speed(self, speed_rate):
         """通过线性插值改变音频速度
 
-        :param speed_rate: Rate of speed change:
-                           speed_rate > 1.0, speed up the audio;
-                           speed_rate = 1.0, unchanged;
-                           speed_rate < 1.0, slow down the audio;
-                           speed_rate <= 0.0, not allowed, raise ValueError.
+        :param speed_rate: 修改的音频速率:
+                           speed_rate > 1.0, 加快音频速度;
+                           speed_rate = 1.0, 音频速度不变;
+                           speed_rate < 1.0, 减慢音频速度;
+                           speed_rate <= 0.0, 错误数值.
         :type speed_rate: float
         :raises ValueError: If speed_rate <= 0.0.
         """
@@ -288,16 +284,11 @@ class AudioSegment(object):
     def normalize(self, target_db=-20, max_gain_db=300.0):
         """将音频归一化，使其具有所需的有效值(以分贝为单位)
 
-        :param target_db: Target RMS value in decibels. This value should be
-                          less than 0.0 as 0.0 is full-scale audio.
+        :param target_db: 目标均方根值，单位为分贝。这个值应该小于0.0，因为0.0是全尺寸音频。
         :type target_db: float
-        :param max_gain_db: Max amount of gain in dB that can be applied for
-                            normalization. This is to prevent nans when
-                            attempting to normalize a signal consisting of
-                            all zeros.
+        :param max_gain_db: 最大允许的增益值，单位为分贝，这是为了防止在对全0信号进行归一化时出现Nan
         :type max_gain_db: float
-        :raises ValueError: If the required gain to normalize the segment to
-                            the target_db value exceeds max_gain_db.
+        :raises ValueError: 如果所需的增益大于max_gain_db，则引发ValueError
         """
         gain = target_db - self.rms_db
         if gain > max_gain_db:
@@ -307,11 +298,9 @@ class AudioSegment(object):
     def resample(self, target_sample_rate, filter='kaiser_best'):
         """按目标采样率重新采样音频
 
-        Note that this is an in-place transformation.
-
-        :param target_sample_rate: Target sample rate.
+        :param target_sample_rate: 重采样的目标采样率
         :type target_sample_rate: int
-        :param filter: The resampling filter to use one of {'kaiser_best', 'kaiser_fast'}.
+        :param filter: 使用的重采样滤波器，支持kaiser_best、kaiser_fast
         :type filter: str
         """
         self._samples = resampy.resample(self.samples, self.sample_rate, target_sample_rate, filter=filter)
@@ -320,16 +309,14 @@ class AudioSegment(object):
     def pad_silence(self, duration, sides='both'):
         """在这个音频样本上加一段静音
 
-        Note that this is an in-place transformation.
-
-        :param duration: Length of silence in seconds to pad.
+        :param duration: 静默段的持续时间(以秒为单位)
         :type duration: float
-        :param sides: Position for padding:
-                     'beginning' - adds silence in the beginning;
-                     'end' - adds silence in the end;
-                     'both' - adds silence in both the beginning and the end.
+        :param sides: 添加的位置:
+                     'beginning' - 在开始位置前增加静音段;
+                     'end' - 在结束位置增加静音段;
+                     'both' - 在开始和结束位置都增加静音段.
         :type sides: str
-        :raises ValueError: If sides is not supported.
+        :raises ValueError: 如果sides的值不是beginning、end或both，则引发ValueError
         """
         if duration == 0.0:
             return self
@@ -358,12 +345,9 @@ class AudioSegment(object):
     def shift(self, shift_ms):
         """音频偏移。如果shift_ms为正，则随时间提前移位;如果为负，则随时间延迟移位。填补静音以保持持续时间不变。
 
-        Note that this is an in-place transformation.
-
-        :param shift_ms: Shift time in millseconds. If positive, shift with
-                         time advance; if negative; shift with time delay.
+        :param shift_ms: 偏移时间。如果是正的，随时间前进；如果负，延时移位。
         :type shift_ms: float
-        :raises ValueError: If shift_ms is longer than audio duration.
+        :raises ValueError: 如果shift_ms的绝对值大于音频持续时间，则引发ValueError
         """
         if abs(shift_ms) / 1000.0 > self.duration:
             raise ValueError("shift_ms的绝对值应该小于音频持续时间")
@@ -380,14 +364,11 @@ class AudioSegment(object):
     def subsegment(self, start_sec=None, end_sec=None):
         """在给定的边界之间切割音频片段
 
-        Note that this is an in-place transformation.
-
-        :param start_sec: Beginning of subsegment in seconds.
+        :param start_sec: 开始裁剪的位置，以秒为单位，默认为0
         :type start_sec: float
-        :param end_sec: End of subsegment in seconds.
+        :param end_sec: 结束裁剪的位置，以秒为单位，默认为音频长度
         :type end_sec: float
-        :raise ValueError: If start_sec or end_sec is incorrectly set, e.g. out
-                           of bounds in time.
+        :raise ValueError: 如果start_sec或end_sec的值越界，则引发ValueError
         """
         start_sec = 0.0 if start_sec is None else start_sec
         end_sec = self.duration if end_sec is None else end_sec
@@ -410,16 +391,12 @@ class AudioSegment(object):
     def random_subsegment(self, subsegment_length):
         """随机剪切指定长度的音频片段
 
-        Note that this is an in-place transformation.
-
-        :param subsegment_length: Subsegment length in seconds.
+        :param subsegment_length: 随机裁剪的片段长度，以秒为单位
         :type subsegment_length: float
-        :raises ValueError: If the length of subsegment is greater than
-                            the origineal segemnt.
+        :raises ValueError: 如果片段长度大于原始段，则引发ValueError
         """
         if subsegment_length > self.duration:
-            raise ValueError("Length of subsegment must not be greater "
-                             "than original segment.")
+            raise ValueError("裁剪的片段长度大于原始音频的长度")
         start_time = random.uniform(0.0, self.duration - subsegment_length)
         self.subsegment(start_time, start_time + subsegment_length)
 
@@ -462,19 +439,15 @@ class AudioSegment(object):
     def add_noise(self, noise_file, snr_dB, max_gain_db=300.0, allow_resample=True):
         """以特定的信噪比添加给定的噪声段。如果噪声段比该噪声段长，则从该噪声段中采样匹配长度的随机子段。
 
-        Note that this is an in-place transformation.
-
         :param noise_file: 噪声音频的路径
         :type noise_file: str
-        :param snr_dB: Signal-to-Noise Ratio, in decibels.
+        :param snr_dB: 信噪比，单位为分贝
         :type snr_dB: float
-        :param max_gain_db: Maximum amount of gain to apply to noise signal
-                            before adding it in. This is to prevent attempting
-                            to apply infinite gain to a zero signal.
+        :param max_gain_db: 最大允许的增益值，单位为分贝，这是为了防止在对全0信号进行归一化时出现Nan
         :type max_gain_db: float
         :param allow_resample: 指示是否允许在两个音频段具有不同的采样率时重采样
         :type allow_resample: bool
-        :raises ValueError: 两个音频段之间的采样率不匹配
+        :raises ValueError: 如果两个音频段之间的采样率不匹配，则引发ValueError
         """
         # 读取噪声音频
         noise_segment = AudioSegment.from_file(noise_file)
@@ -494,13 +467,20 @@ class AudioSegment(object):
 
     # 裁剪音频
     def crop(self, duration, mode='eval'):
+        """根据模式裁剪指定的音频长度，如果为'train'模式，则随机剪切，否则从末尾剪切
+
+        :param duration: 裁剪的音频长度，以秒为单位
+        :type duration: float
+        :param mode: 裁剪的模型，'train'或'eval'
+        :type mode: str
+        """
         if self.duration > duration:
             if mode == 'train':
                 self.random_subsegment(duration)
             else:
                 self.subsegment(end_sec=duration)
 
-    def vad(self, **kwargs) -> List[Dict]:
+    def vad(self, **kwargs):
         """使用VAD模型进行语音活动检测
 
         :param kwargs: 传递给Silero VAD模型的参数
@@ -516,45 +496,40 @@ class AudioSegment(object):
 
     @property
     def samples(self):
-        """返回音频样本
-
-        :return: Audio samples.
+        """
+        :return: 返回音频样本
         :rtype: ndarray
         """
         return self._samples.copy()
 
     @property
     def sample_rate(self):
-        """返回音频采样率
-
-        :return: Audio sample rate.
+        """
+        :return: 返回音频采样率
         :rtype: int
         """
         return self._sample_rate
 
     @property
     def num_samples(self):
-        """返回样品数量
-
-        :return: Number of samples.
+        """
+        :return: 返回样品数量
         :rtype: int
         """
         return self._samples.shape[0]
 
     @property
     def duration(self):
-        """返回音频持续时间
-
-        :return: Audio duration in seconds.
+        """
+        :return: 返回音频持续时间，以秒为单位
         :rtype: float
         """
         return self._samples.shape[0] / float(self._sample_rate)
 
     @property
     def rms_db(self):
-        """返回以分贝为单位的音频均方根能量
-
-        :return: Root mean square energy in decibels.
+        """
+        :return: 返回以分贝为单位的音频均方根能量
         :rtype: float
         """
         # square root => multiply by 10 instead of 20 for dBs
@@ -565,10 +540,9 @@ class AudioSegment(object):
 
     @staticmethod
     def _convert_samples_to_float32(samples):
-        """Convert sample type to float32.
+        """把样本的类型转为float32.
 
-        Audio sample type is usually integer or float-point.
-        Integers will be scaled to [-1, 1] in float32.
+        音频样本类型通常是整数或浮点数，整数将被缩放为float32类型的[- 1,1]。
         """
         float32_samples = samples.astype('float32')
         if samples.dtype in [np.int8, np.int16, np.int32, np.int64]:
