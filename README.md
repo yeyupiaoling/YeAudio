@@ -53,6 +53,18 @@ print(f'音频数据：{audio_segment.samples}')
  - **samples（ndarray.float32）：** 频数据，维度为[num_samples x num_channels]
  - **sample_rate（int）：** 音频的采样率
 
+**示例代码：**
+
+```python
+import soundfile
+from yeaudio.audio import AudioSegment
+
+samples, sample_rate = soundfile.read("data/test.wav")
+audio_segment = AudioSegment(samples, sample_rate)
+print(audio_segment.samples)
+```
+<br/>
+
 ---
 
 > **def `__eq__`(self, other):**
@@ -62,6 +74,17 @@ print(f'音频数据：{audio_segment.samples}')
 **参数：**
 
  - **other（AudioSegment）：** 比较的另一个音频片段实例
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment1 = AudioSegment.from_file("data/test.wav")
+audio_segment2 = AudioSegment.from_file("data/test.wav")
+print(audio_segment1 == audio_segment2)
+```
+<br/>
 
 ---
 
@@ -73,11 +96,32 @@ print(f'音频数据：{audio_segment.samples}')
 
  - **other（AudioSegment）：** 比较的另一个音频片段实例
 
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment1 = AudioSegment.from_file("data/test.wav")
+audio_segment2 = AudioSegment.from_file("data/test.wav")
+print(audio_segment1 != audio_segment2)
+```
+<br/>
+
 ---
 
 > **def `__str__`(self):**
 
 返回该音频的信息
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+print(str(audio_segment))
+```
+<br/>
 
 ---
 
@@ -294,6 +338,16 @@ print(audio_segment.samples)
 
  - `TypeError`：如果类型不支持，则会抛出TypeError异常
 
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.to_wav_file("output.wav")
+```
+<br/>
+
 ---
 
 > **def superimpose(self, other):**
@@ -310,6 +364,17 @@ print(audio_segment.samples)
  - `ValueError`：如果两段音频采样率或者长度不一致，则会抛出ValueError异常
  - `TypeError`：如果两个片段的类型不匹配，则会抛出TypeError异常
 
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+other_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.superimpose(other_segment)
+```
+<br/>
+
 ---
 
 > **def to_bytes(self, dtype='float32'):**
@@ -323,6 +388,16 @@ print(audio_segment.samples)
 **返回：**
 
  - `str`：包含音频内容的字节字符串
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+print(audio_segment.to_bytes())
+```
+<br/>
 
 ---
 
@@ -338,6 +413,16 @@ print(audio_segment.samples)
 
  - `str`：转换后的数据
 
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+print(audio_segment.to(dtype='int16'))
+```
+<br/>
+
 ---
 
 > **def gain_db(self, gain):**
@@ -347,6 +432,17 @@ print(audio_segment.samples)
 **参数：**
 
  - **gain（float|1darray）：** 用于样品的分贝增益
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.gain_db(gain=-20)
+print(audio_segment.samples)
+```
+<br/>
 
 ---
 
@@ -358,10 +454,20 @@ print(audio_segment.samples)
 
  - **speed_rate（float）：** 修改的音频速率: speed_rate > 1.0, 加快音频速度; speed_rate = 1.0, 音频速度不变; speed_rate < 1.0, 减慢音频速度; speed_rate <= 0.0, 错误数值.
 
-
 **异常：**
 
  - `ValueError`：如果速度速率小于或等于0，则引发ValueError
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.change_speed(speed_rate=1.2)
+print(audio_segment.samples)
+```
+<br/>
 
 ---
 
@@ -374,10 +480,20 @@ print(audio_segment.samples)
  - **target_db（float）：** 目标均方根值，单位为分贝。这个值应该小于0.0，因为0.0是全尺寸音频。
  - **max_gain_db（float）：** 最大允许的增益值，单位为分贝，这是为了防止在对全0信号进行归一化时出现Nan值。
 
-
 **异常：**
 
  - `ValueError`：如果所需的增益大于max_gain_db，则引发ValueError
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.normalize(target_db=-20)
+print(audio_segment.samples)
+```
+<br/>
 
 ---
 
@@ -390,6 +506,17 @@ print(audio_segment.samples)
  - **target_sample_rate（int）：** 目标均方根值，单位为分贝。这个值应该小于0.0，因为0.0是全尺寸音频。
  - **filter（str）：** 使用的重采样滤波器，支持'kaiser_best'、'kaiser_fast'
 
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.resample(target_sample_rate=8000)
+print(audio_segment.samples)
+```
+<br/>
+
 ---
 
 > **def pad_silence(self, duration, sides='both'):**
@@ -401,10 +528,20 @@ print(audio_segment.samples)
  - **duration（float）：** 静默段的持续时间(以秒为单位)
  - **sides（str）：** 添加的位置: 'beginning' - 在开始位置前增加静音段; 'end' - 在结束位置增加静音段; 'both' - 在开始和结束位置都增加静音段.。
 
-
 **异常：**
 
  - `ValueError`：如果sides的值不是beginning、end或both，则引发ValueError
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.pad_silence(duration=2, sides='end')
+print(audio_segment.samples)
+```
+<br/>
 
 ---
 
@@ -416,6 +553,17 @@ print(audio_segment.samples)
 
  - **pad_width（sequence|array_like|int）：** 填充宽度
  - **sides（str|function|optional）：** 填充模式
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.pad(pad_width=(0, 16000 * 2), mode='wrap')
+print(audio_segment.samples)
+```
+<br/>
 
 ---
 
@@ -430,6 +578,17 @@ print(audio_segment.samples)
 **异常：**
 
  - `ValueError`：如果shift_ms的绝对值大于音频持续时间，则引发ValueError
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.shift(shift_ms=1000)
+print(audio_segment.samples)
+```
+<br/>
 
 ---
 
@@ -446,19 +605,41 @@ print(audio_segment.samples)
 
  - `ValueError`：如果start_sec或end_sec的值越界，则引发ValueError
 
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.subsegment(start_sec=1, end_sec=3)
+print(audio_segment.samples)
+```
+<br/>
+
 ---
 
-> **def random_subsegment(self, subsegment_length):**
+> **def random_subsegment(self, duration):**
 
 随机剪切指定长度的音频片段。
 
 **参数：**
 
- - **subsegment_length（float）：** 随机裁剪的片段长度，以秒为单位
+ - **duration（float）：** 随机裁剪的片段长度，以秒为单位
 
 **异常：**
 
  - `ValueError`：如果片段长度大于原始段，则引发ValueError
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.random_subsegment(duration=2)
+print(audio_segment.samples)
+```
+<br/>
 
 ---
 
@@ -475,6 +656,17 @@ print(audio_segment.samples)
 
  - `ValueError`：如果两个音频段之间的采样率不匹配，则引发ValueError
 
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.convolve(reverb_file='data/reverb.wav')
+print(audio_segment.samples)
+```
+<br/>
+
 ---
 
 > **def convolve_and_normalize(self, reverb_file, allow_resample=True):**
@@ -489,6 +681,17 @@ print(audio_segment.samples)
 **异常：**
 
  - `ValueError`：如果两个音频段之间的采样率不匹配，则引发ValueError
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.convolve_and_normalize(reverb_file='data/reverb.wav')
+print(audio_segment.samples)
+```
+<br/>
 
 ---
 
@@ -507,6 +710,17 @@ print(audio_segment.samples)
 
  - `ValueError`：如果两个音频段之间的采样率不匹配，则引发ValueError
 
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.add_noise(noise_file='data/noise.wav', snr_dB=10)
+print(audio_segment.samples)
+```
+<br/>
+
 ---
 
 > **def crop(self, duration, mode='eval'):**
@@ -522,6 +736,17 @@ print(audio_segment.samples)
 
  - `ValueError`：如果两个音频段之间的采样率不匹配，则引发ValueError
 
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+audio_segment.crop(duration=3, mode='train')
+print(audio_segment.samples)
+```
+<br/>
+
 ---
 
 > **def vad(self, return_seconds=False, \*\*kwargs):**
@@ -536,6 +761,18 @@ print(audio_segment.samples)
 **返回：**
 
  - `List[Dict]`：语音活动时间戳列表
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+speech_timestamps = audio_segment.vad(return_seconds=True)
+for speech_timestamp in speech_timestamps:
+    print(speech_timestamp)
+```
+<br/>
 
 ---
 

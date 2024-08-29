@@ -276,8 +276,8 @@ def get_speech_timestamps(audio,
 
     if return_seconds:
         for speech_dict in speeches:
-            speech_dict['start'] = round(speech_dict['start'] / sampling_rate, 1)
-            speech_dict['end'] = round(speech_dict['end'] / sampling_rate, 1)
+            speech_dict['start'] = round(speech_dict['start'] / sampling_rate, 3)
+            speech_dict['end'] = round(speech_dict['end'] / sampling_rate, 3)
     elif step > 1:
         for speech_dict in speeches:
             speech_dict['start'] *= step

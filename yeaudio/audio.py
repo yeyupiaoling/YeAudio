@@ -388,17 +388,17 @@ class AudioSegment(object):
         end_sample = int(round(end_sec * self._sample_rate))
         self._samples = self._samples[start_sample:end_sample]
 
-    def random_subsegment(self, subsegment_length):
+    def random_subsegment(self, duration):
         """随机剪切指定长度的音频片段
 
-        :param subsegment_length: 随机裁剪的片段长度，以秒为单位
-        :type subsegment_length: float
+        :param duration: 随机裁剪的片段长度，以秒为单位
+        :type duration: float
         :raises ValueError: 如果片段长度大于原始段，则引发ValueError
         """
-        if subsegment_length > self.duration:
+        if duration > self.duration:
             raise ValueError("裁剪的片段长度大于原始音频的长度")
-        start_time = random.uniform(0.0, self.duration - subsegment_length)
-        self.subsegment(start_time, start_time + subsegment_length)
+        start_time = random.uniform(0.0, self.duration - duration)
+        self.subsegment(start_time, start_time + duration)
 
     def convolve(self, reverb_file, allow_resample=True):
         """将这个音频段与给定的音频进行卷积，通常用于添加混响
