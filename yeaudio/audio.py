@@ -400,8 +400,8 @@ class AudioSegment(object):
         start_time = random.uniform(0.0, self.duration - duration)
         self.subsegment(start_time, start_time + duration)
 
-    def convolve(self, reverb_file, allow_resample=True):
-        """将这个音频段与给定的音频进行卷积，通常用于添加混响
+    def reverb(self, reverb_file, allow_resample=True):
+        """使音频片段混响
 
         :param reverb_file: 混响音频的路径
         :type reverb_file: str
@@ -423,8 +423,8 @@ class AudioSegment(object):
         samples = samples / (np.max(np.abs(samples)) + 1e-6)
         self._samples = samples[:self.num_samples]
 
-    def convolve_and_normalize(self, reverb_file, allow_resample=True):
-        """将这个音频段与给定的音频进行卷积，通常用于添加混响，然后归一化
+    def reverb_and_normalize(self, reverb_file, allow_resample=True):
+        """使音频片段混响，然后归一化
 
         :param reverb_file: 混响音频的路径
         :type reverb_file: str
@@ -433,7 +433,7 @@ class AudioSegment(object):
         :raises ValueError: 两个音频段之间的采样率不匹配
         """
         target_db = self.rms_db
-        self.convolve(reverb_file, allow_resample=allow_resample)
+        self.reverb(reverb_file, allow_resample=allow_resample)
         self.normalize(target_db)
 
     def add_noise(self, noise_file, snr_dB, max_gain_db=300.0, allow_resample=True):

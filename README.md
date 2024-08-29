@@ -643,9 +643,9 @@ print(audio_segment.samples)
 
 ---
 
-> **def convolve(self, reverb_file, allow_resample=True):**
+> **def reverb(self, reverb_file, allow_resample=True):**
 
-将这个音频段与给定的音频进行卷积，通常用于添加混响。
+使音频片段混响。
 
 **参数：**
 
@@ -662,16 +662,16 @@ print(audio_segment.samples)
 from yeaudio.audio import AudioSegment
 
 audio_segment = AudioSegment.from_file("data/test.wav")
-audio_segment.convolve(reverb_file='data/reverb.wav')
+audio_segment.reverb(reverb_file='data/reverb.wav')
 print(audio_segment.samples)
 ```
 <br/>
 
 ---
 
-> **def convolve_and_normalize(self, reverb_file, allow_resample=True):**
+> **def reverb_and_normalize(self, reverb_file, allow_resample=True):**
 
-将这个音频段与给定的音频进行卷积，通常用于添加混响，然后归一化。
+使音频片段混响，然后归一化。
 
 **参数：**
 
@@ -688,7 +688,7 @@ print(audio_segment.samples)
 from yeaudio.audio import AudioSegment
 
 audio_segment = AudioSegment.from_file("data/test.wav")
-audio_segment.convolve_and_normalize(reverb_file='data/reverb.wav')
+audio_segment.reverb_and_normalize(reverb_file='data/reverb.wav')
 print(audio_segment.samples)
 ```
 <br/>
