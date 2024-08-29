@@ -198,7 +198,7 @@ class AudioSegment(object):
         :type filepath: str|file
         :param dtype: 音频数据类型，可选: 'int16', 'int32', 'float32', 'float64'
         :type dtype: str
-        :raises TypeError: 类型不支持
+        :raises TypeError: 如果类型不支持，则会抛出TypeError异常
         """
         samples = self._convert_samples_from_float32(self._samples, dtype)
         subtype_map = {
@@ -219,8 +219,8 @@ class AudioSegment(object):
 
         :param other: 包含样品的片段被添加进去
         :type other: AudioSegments
-        :raise TypeError: 如果两个片段的类型不匹配
-        :raise ValueError: 不能添加不同类型的段
+        :raise ValueError: 如果两段音频采样率或者长度不一致，则会抛出ValueError异常
+        :raise TypeError: 如果两个片段的类型不匹配，则会抛出TypeError异常
         """
         if not isinstance(other, type(self)):
             raise TypeError(f"不能添加不同类型的段: {type(self)} 和 {type(other)}")
@@ -269,7 +269,7 @@ class AudioSegment(object):
                            speed_rate < 1.0, 减慢音频速度;
                            speed_rate <= 0.0, 错误数值.
         :type speed_rate: float
-        :raises ValueError: If speed_rate <= 0.0.
+        :raises ValueError: 如果速度速率小于或等于0，则引发ValueError
         """
         if speed_rate == 1.0:
             return
@@ -286,7 +286,7 @@ class AudioSegment(object):
 
         :param target_db: 目标均方根值，单位为分贝。这个值应该小于0.0，因为0.0是全尺寸音频。
         :type target_db: float
-        :param max_gain_db: 最大允许的增益值，单位为分贝，这是为了防止在对全0信号进行归一化时出现Nan
+        :param max_gain_db: 最大允许的增益值，单位为分贝，这是为了防止在对全0信号进行归一化时出现Nan值。
         :type max_gain_db: float
         :raises ValueError: 如果所需的增益大于max_gain_db，则引发ValueError
         """
@@ -300,7 +300,7 @@ class AudioSegment(object):
 
         :param target_sample_rate: 重采样的目标采样率
         :type target_sample_rate: int
-        :param filter: 使用的重采样滤波器，支持kaiser_best、kaiser_fast
+        :param filter: 使用的重采样滤波器，支持'kaiser_best'、'kaiser_fast'
         :type filter: str
         """
         self._samples = resampy.resample(self.samples, self.sample_rate, target_sample_rate, filter=filter)
@@ -336,9 +336,9 @@ class AudioSegment(object):
         """在这个音频样本上加一段音频，等同numpy.pad
 
         param pad_width: Padding width.
-        :type pad_width: {sequence, array_like, int}
-        :param mode: Padding mode.
-        :type mode: str or function, optional
+        :type pad_width: sequence|array_like|int
+        :param mode: 填充模式
+        :type mode: str|function|optional
         """
         self._samples = np.pad(self.samples, pad_width=pad_width, mode=mode, **kwargs)
 
@@ -407,7 +407,7 @@ class AudioSegment(object):
         :type reverb_file: str
         :param allow_resample: 指示是否允许在两个音频段具有不同的采样率时重采样
         :type allow_resample: bool
-        :raises ValueError: 两个音频段之间的采样率不匹配
+        :raises ValueError: 如果两个音频段之间的采样率不匹配，则引发ValueError
         """
         # 读取混响音频
         reverb_segment = AudioSegment.from_file(reverb_file)
@@ -480,9 +480,11 @@ class AudioSegment(object):
             else:
                 self.subsegment(end_sec=duration)
 
-    def vad(self, **kwargs):
+    def vad(self, return_seconds=False, **kwargs):
         """使用VAD模型进行语音活动检测
 
+        :param return_seconds: 指示是否返回秒数而不是样本索引
+        :type return_seconds: bool
         :param kwargs: 传递给Silero VAD模型的参数
         :type kwargs: dict
         :return: 语音活动时间戳列表
@@ -491,7 +493,7 @@ class AudioSegment(object):
         from yeaudio.utils.silero_vad import load_silero_vad, get_speech_timestamps
         if self.vad_model is None:
             self.vad_model = load_silero_vad()
-        speech_timestamps = get_speech_timestamps(self.samples, self.vad_model, **kwargs)
+        speech_timestamps = get_speech_timestamps(self.samples, self.vad_model, return_seconds=return_seconds, **kwargs)
         return speech_timestamps
 
     @property

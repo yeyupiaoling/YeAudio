@@ -97,7 +97,7 @@ class OnnxWrapper(object):
 
         if x.shape[1] % num_samples:
             pad_num = num_samples - (x.shape[1] % num_samples)
-            x = np.pad(x, (0, pad_num), mode='constant', constant_values=0.0)
+            x = np.pad(x, ((0, 0), (0, pad_num)))
 
         for i in range(0, x.shape[1], num_samples):
             wavs_batch = x[:, i:i + num_samples]
@@ -191,7 +191,7 @@ def get_speech_timestamps(audio,
     for current_start_sample in range(0, audio_length_samples, window_size_samples):
         chunk = audio[current_start_sample: current_start_sample + window_size_samples]
         if len(chunk) < window_size_samples:
-            chunk = np.pad(chunk, (0, int(window_size_samples - len(chunk))), mode='constant', constant_values=0)
+            chunk = np.pad(chunk, (0, int(window_size_samples - len(chunk))))
         speech_prob = model(chunk, sampling_rate)
         speech_probs.append(speech_prob)
         # caculate progress and seng it to callback function
