@@ -1035,6 +1035,7 @@ print(audio_segment.rms_db)
  - **time_mask_ratio（float）：** 时间掩蔽的比例
  - **n_time_masks（int）：** 时间掩蔽次数
  - **inplace（bool）：** 用结果覆盖
+ - **max_time_warp（bool）：** 最大时间扭曲
  - **replace_with_zero（bool）：** 是否使用0作为掩码，否则使用平均值
 
 > **def `__call__`(self, x) -> np.ndarray:**
