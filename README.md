@@ -42,6 +42,20 @@ print(f'音频数据：{audio_segment.samples}')
 
 # API文档
 
+ - [AudioSegment](#AudioSegment)
+ - [SpeedPerturbAugmentor](#SpeedPerturbAugmentor)
+ - [VolumePerturbAugmentor](#VolumePerturbAugmentor)
+ - [ShiftPerturbAugmentor](#ShiftPerturbAugmentor)
+ - [ResampleAugmentor](#ResampleAugmentor)
+ - [NoisePerturbAugmentor](#NoisePerturbAugmentor)
+ - [ReverbPerturbAugmentor](#ReverbPerturbAugmentor)
+ - [SpecAugmentor](#SpecAugmentor)
+ - [SpecSubAugmentor](#SpecSubAugmentor)
+
+## AudioSegment
+
+基础音频工具，支持读取多种格式的音频文件，已经各种基础操作，如裁剪、添加混响、添加噪声等。
+
 <br/>
 
 > **def `__init__`(self, samples, sample_rate):**
@@ -878,3 +892,154 @@ audio_segment = AudioSegment.from_file('data/test.wav')
 print(audio_segment.rms_db)
 ```
 <br/>
+
+
+## SpeedPerturbAugmentor
+
+随机语速扰动的音频数据增强器
+
+
+> **def `__init__`(self, prob=1.0, speed_perturb_3_class=False, num_speakers=None):**
+
+**参数：**
+
+ - **prob（float）：** 数据增强概率
+ - **speed_perturb_3_class（bool）：** 是否使用语速三类语速增强，只在声纹识别项目上使用
+ - **num_speakers（int）：** 说话人数量，只在声纹识别项目上使用
+
+> **def `__call__`(self, audio_segment: AudioSegment, spk_id: int = None) -> AudioSegment or \[AudioSegment, int]:**
+
+**参数：**
+
+ - **audio_segment：** AudioSegment实例
+
+
+## VolumePerturbAugmentor
+
+随机音量扰动的音频数据增强器
+
+
+> **def `__init__`(self, prob=0.0, min_gain_dBFS=-15, max_gain_dBFS=15):**
+
+**参数：**
+
+ - **prob（float）：** 数据增强概率
+ - **min_gain_dBFS（int）：** 最小音量，单位为分贝。
+ - **max_gain_dBFS（int）：** 最大音量，单位为分贝。
+
+> **def `__call__`(self, audio_segment: AudioSegment) -> AudioSegment:**
+
+**参数：**
+
+ - **audio_segment：** AudioSegment实例
+
+
+## ShiftPerturbAugmentor
+
+添加随机位移扰动的音频数增强器
+
+
+> **def `__init__`(self, prob=0.0, min_shift_ms=-15, max_shift_ms=15):**
+
+**参数：**
+
+ - **prob（float）：** 数据增强概率
+ - **min_shift_ms（int）：** 最小偏移，单位为毫秒。
+ - **max_shift_ms（int）：** 最大偏移，单位为毫秒。
+
+> **def `__call__`(self, audio_segment: AudioSegment) -> AudioSegment:**
+
+**参数：**
+
+ - **audio_segment：** AudioSegment实例
+
+
+## ResampleAugmentor
+
+随机重采样的音频数据增强器
+
+
+> **def `__init__`(self, prob=0.0, new_sample_rate=(8000, 16000, 24000)):**
+
+**参数：**
+
+ - **prob（float）：** 数据增强概率
+ - **new_sample_rate（list）：** 新采样率列表
+
+> **def `__call__`(self, audio_segment: AudioSegment) -> AudioSegment:**
+
+**参数：**
+
+ - **audio_segment：** AudioSegment实例
+
+
+## NoisePerturbAugmentor
+
+随机噪声扰动的音频数据增强器
+
+
+> **def `__init__`(self, noise_dir='', prob=0.0, min_snr_dB=10, max_snr_dB=50):**
+
+**参数：**
+
+ - **noise_dir（str）：** 噪声文件夹路径，该文件夹下是噪声音频文件
+ - **prob（float）：** 数据增强概率
+ - **min_snr_dB（int）：** 最小信噪比
+ - **max_snr_dB（int）：** 最大信噪比
+
+> **def `__call__`(self, audio_segment: AudioSegment) -> AudioSegment:**
+
+**参数：**
+
+ - **audio_segment：** AudioSegment实例
+
+
+## ReverbPerturbAugmentor
+
+随机混响的音频数据增强器
+
+> **def `__init__`(self, reverb_dir='', prob=0.0):**
+
+**参数：**
+
+ - **reverb_dir（str）：** 混响文件夹路径，该文件夹下是噪声音频文件
+ - **prob（float）：** 数据增强概率
+
+> **def `__call__`(self, audio_segment: AudioSegment) -> AudioSegment:**
+
+**参数：**
+
+ - **audio_segment：** AudioSegment实例
+
+
+## SpecAugmentor
+
+频域掩蔽和时域掩蔽的音频特征数据增强器<br/>
+论文：https://arxiv.org/abs/1904.08779<br/>
+论文：https://arxiv.org/abs/1912.05533
+
+> **def `__init__`(self, prob=0.0,
+                   freq_mask_ratio=0.15,
+                   n_freq_masks=2,
+                   time_mask_ratio=0.05,
+                   n_time_masks=2,
+                   inplace=True,
+                   max_time_warp=5,
+                   replace_with_zero=False):**
+
+**参数：**
+
+ - **prob（float）：** 数据增强概率
+ - **freq_mask_ratio（float）：** 频域掩蔽的比例
+ - **n_freq_masks（int）：** 频域掩蔽次数
+ - **time_mask_ratio（float）：** 时间掩蔽的比例
+ - **n_time_masks（int）：** 时间掩蔽次数
+ - **inplace（bool）：** 用结果覆盖
+ - **replace_with_zero（bool）：** 是否使用0作为掩码，否则使用平均值
+
+> **def `__call__`(self, audio_segment: AudioSegment) -> AudioSegment:**
+
+**参数：**
+
+ - **audio_segment：** AudioSegment实例
+
