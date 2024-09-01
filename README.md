@@ -1037,9 +1037,28 @@ print(audio_segment.rms_db)
  - **inplace（bool）：** 用结果覆盖
  - **replace_with_zero（bool）：** 是否使用0作为掩码，否则使用平均值
 
-> **def `__call__`(self, audio_segment: AudioSegment) -> AudioSegment:**
+> **def `__call__`(self, x) -> np.ndarray:**
 
 **参数：**
 
- - **audio_segment：** AudioSegment实例
+ - **x：** 音频特征，维度(time, freq)
 
+
+## SpecSubAugmentor
+
+从原始音频中随机替换部分帧，以模拟语音的时移。<br/>
+论文：https://arxiv.org/abs/2106.05642
+
+> **def `__init__`(self, prob=0.0, max_time=20, num_time_sub=3):**
+
+**参数：**
+
+ - **prob（float）：** 数据增强概率
+ - **max_time（int）：** 时间替换的最大宽度
+ - **num_time_sub（int）：** 时间替换的的次数
+
+> **def `__call__`(self, x) -> np.ndarray:**
+
+**参数：**
+
+ - **x：** 音频特征，维度(time, freq)

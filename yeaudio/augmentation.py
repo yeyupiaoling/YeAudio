@@ -278,7 +278,7 @@ class SpecAugmentor(object):
 
     def __call__(self, x) -> np.ndarray:
         """
-        param x: spectrogram (time, freq)
+        param x: 音频特征，维度(time, freq)
         type x: np.ndarray
         """
         if random.random() < self.prob:
@@ -309,7 +309,7 @@ class SpecSubAugmentor(object):
 
     def __call__(self, x) -> np.ndarray:
         """
-        param x: spectrogram (time, freq)
+        param x: 音频特征，维度(time, freq)
         type x: np.ndarray
         """
         y = x.copy()
