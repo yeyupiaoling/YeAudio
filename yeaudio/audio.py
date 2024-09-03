@@ -303,6 +303,7 @@ class AudioSegment(object):
         :param filter: 使用的重采样滤波器，支持'kaiser_best'、'kaiser_fast'
         :type filter: str
         """
+        if self.sample_rate == target_sample_rate: return
         self._samples = resampy.resample(self.samples, self.sample_rate, target_sample_rate, filter=filter)
         self._sample_rate = target_sample_rate
 
