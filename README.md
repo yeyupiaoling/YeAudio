@@ -1064,6 +1064,9 @@ print(audio_segment.rms_db)
 
  - **x：** 音频特征，维度(time, freq)
 
+<br/>
+
+---
 
 ## StreamingVAD
 
@@ -1086,3 +1089,20 @@ print(audio_segment.rms_db)
 **返回：**
 
  - `VADState`：识别结果
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+from yeaudio.streaming_vad import StreamingVAD
+
+audio_seg = AudioSegment.from_file('data/test.wav')
+data = audio_seg.samples
+
+streaming_vad = StreamingVAD(sample_rate=audio_seg.sample_rate)
+
+for ith_frame in range(0, len(data), streaming_vad.vad_frames):
+    buffer = data[ith_frame:ith_frame + streaming_vad.vad_frames]
+    state = streaming_vad(buffer)
+    print("VAD state:", state)
+```
