@@ -1063,3 +1063,26 @@ print(audio_segment.rms_db)
 **参数：**
 
  - **x：** 音频特征，维度(time, freq)
+
+
+## StreamingVAD
+
+流式语音活动（VAD）检测器
+
+> **def `__init__`(self, sample_rate: int = 16000, num_channels: int = 1, params: VADParams = VADParams()):**
+
+**参数：**
+
+ - **sample_rate（int）：** 音频的采样率
+ - **num_channels（int）：** 音频的通道数
+ - **params（VADParams）：** VAD参数
+
+> **def `__call__`(self, buffer: Union[bytes, np.ndarray]) -> VADState:**
+
+**参数：**
+
+ - **buffer（Union[bytes, np.ndarray]）：** 输入的音频，小于等于vad_frames的长度或者vad_frames_num_bytes的字节长度
+
+**返回：**
+
+ - `VADState`：识别结果
