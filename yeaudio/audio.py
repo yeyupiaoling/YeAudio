@@ -551,7 +551,7 @@ class AudioSegment(object):
         if samples.dtype in [np.int8, np.int16, np.int32, np.int64]:
             bits = np.iinfo(samples.dtype).bits
             float32_samples *= (1. / 2 ** (bits - 1))
-        elif samples.dtype in np.sctypes['float']:
+        elif samples.dtype in [np.float16, np.float32, np.float64]:
             pass
         else:
             raise TypeError(f"Unsupported sample type: {samples.dtype}.")
@@ -576,7 +576,7 @@ class AudioSegment(object):
             max_val = np.iinfo(dtype).max
             output_samples[output_samples > max_val] = max_val
             output_samples[output_samples < min_val] = min_val
-        elif samples.dtype in np.sctypes['float']:
+        elif samples.dtype in [np.float16, np.float32, np.float64]:
             min_val = np.finfo(dtype).min
             max_val = np.finfo(dtype).max
             output_samples[output_samples > max_val] = max_val
