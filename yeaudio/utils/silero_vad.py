@@ -1,5 +1,3 @@
-# @Time    : 2024-08-28
-# @Author  : yeyupiaoling
 # code from https://github.com/snakers4/silero-vad
 import os
 import warnings

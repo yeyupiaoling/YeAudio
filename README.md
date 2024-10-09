@@ -393,7 +393,7 @@ audio_segment.superimpose(other_segment)
 
 > **def to_bytes(self, dtype='float32'):**
 
-创建包含音频内容的字节字符串
+创建音频内容的字节
 
 **参数：**
 
@@ -401,7 +401,7 @@ audio_segment.superimpose(other_segment)
 
 **返回：**
 
- - `str`：包含音频内容的字节字符串
+ - `bytes`：音频内容的字节
 
 **示例代码：**
 
@@ -410,6 +410,26 @@ from yeaudio.audio import AudioSegment
 
 audio_segment = AudioSegment.from_file("data/test.wav")
 print(audio_segment.to_bytes())
+```
+<br/>
+
+---
+
+> **def to_pcm_bytes(self):**
+
+创建pcm格式的字节
+
+**返回：**
+
+ - `bytes`：pcm格式的字节
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+
+audio_segment = AudioSegment.from_file("data/test.wav")
+print(audio_segment.to_pcm_bytes())
 ```
 <br/>
 

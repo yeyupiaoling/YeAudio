@@ -231,15 +231,23 @@ class AudioSegment(object):
         self._samples += other._samples
 
     def to_bytes(self, dtype='float32'):
-        """创建包含音频内容的字节字符串
+        """创建音频内容的字节
 
         :param dtype: 导出样本的数据类型。可选: 'int16', 'int32', 'float32', 'float64'.
         :type dtype: str
-        :return: 包含音频内容的字节字符串
-        :rtype: str
+        :return: 音频内容的字节
+        :rtype: bytes
         """
         samples = self._convert_samples_from_float32(self._samples, dtype)
         return samples.tostring()
+
+    def to_pcm_bytes(self):
+        """创建pcm格式的字节
+
+        :return: pcm格式的字节
+        :rtype: bytes
+        """
+        return self.to_bytes(dtype='int16')
 
     def to(self, dtype='int16'):
         """类型转换
@@ -247,7 +255,7 @@ class AudioSegment(object):
         :param dtype: 导出样本的数据类型。可选: 'int16', 'int32', 'float32', 'float64'
         :type dtype: str
         :return: np.ndarray containing `dtype` audio content.
-        :rtype: str
+        :rtype: np.ndarray
         """
         samples = self._convert_samples_from_float32(self._samples, dtype)
         return samples
