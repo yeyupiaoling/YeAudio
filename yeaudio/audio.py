@@ -4,6 +4,7 @@ import io
 import os
 import random
 from typing import List, Dict
+from loguru import logger
 
 import numpy as np
 import resampy
@@ -499,7 +500,13 @@ class AudioSegment(object):
         :return: 语音活动时间戳列表
         :rtype: List[Dict]
         """
-        from funasr_onnx import Fsmn_vad
+        try:
+            from funasr_onnx import Fsmn_vad
+        except ImportError as e:
+            if 'funasr_onnx' not in str(e):
+                logger.exception(e)
+            else:
+                raise ImportError("请执行命令安装所需的依赖库：pip install -U funasr-onnx modelscope funasr")
         if self.vad_model is None:
             self.vad_model = Fsmn_vad("damo/speech_fsmn_vad_zh-cn-16k-common-pytorch")
         speech_timestamps = self.vad_model(self.samples, fs=self.sample_rate, is_final=True)[0]
