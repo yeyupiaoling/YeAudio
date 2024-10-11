@@ -499,11 +499,21 @@ class AudioSegment(object):
         :return: 语音活动时间戳列表
         :rtype: List[Dict]
         """
-        from yeaudio.utils.silero_vad import load_silero_vad, get_speech_timestamps
+        from funasr_onnx import Fsmn_vad
         if self.vad_model is None:
-            self.vad_model = load_silero_vad()
-        speech_timestamps = get_speech_timestamps(self.samples, self.vad_model, return_seconds=return_seconds, **kwargs)
-        return speech_timestamps
+            self.vad_model = Fsmn_vad("damo/speech_fsmn_vad_zh-cn-16k-common-pytorch")
+        speech_timestamps = self.vad_model(self.samples, fs=self.sample_rate, is_final=True)[0]
+        results = []
+        if not return_seconds:
+            for timestamp in speech_timestamps:
+                result = {"start": timestamp[0] / 1000 * self.sample_rate,
+                          "end": timestamp[1] / 1000 * self.sample_rate}
+                results.append(result)
+        else:
+            for timestamp in speech_timestamps:
+                result = {"start": timestamp[0] / 1000, "end": timestamp[1] / 1000}
+                results.append(result)
+        return results
 
     @property
     def samples(self):
