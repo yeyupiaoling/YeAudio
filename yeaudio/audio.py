@@ -500,7 +500,7 @@ class AudioSegment(object):
         :rtype: List[Dict]
         """
         if self.vad_model is None:
-            from yeaudio.utils.vad_model import VadModel
+            from yeaudio.vad_model import VadModel
             self.vad_model = VadModel(**kwargs)
         speech_timestamps = self.vad_model(self.samples)[0]
         results = []
