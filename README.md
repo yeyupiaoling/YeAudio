@@ -43,6 +43,8 @@ print(f'音频数据：{audio_segment.samples}')
 # API文档
 
  - [AudioSegment](#AudioSegment)
+ - [VadModel](#VadModel)
+ - [VadOnlineModel](#VadOnlineModel)
  - [SpeedPerturbAugmentor](#SpeedPerturbAugmentor)
  - [VolumePerturbAugmentor](#VolumePerturbAugmentor)
  - [ShiftPerturbAugmentor](#ShiftPerturbAugmentor)
@@ -913,6 +915,108 @@ print(audio_segment.rms_db)
 ```
 <br/>
 
+## VadModel
+
+语音活动检测模型，非流式
+
+> **def `__init__`(self,
+                   batch_size: int = 1,
+                   device_id: Union[str, int] = "-1",
+                   quantize: bool = True,
+                   intra_op_num_threads: int = 4,
+                   max_end_sil: int = None):**
+
+**参数：**
+
+ - **batch_size (int, optional):** 批处理大小，默认为1。
+ - **device_id (Union[str, int], optional):** 设备ID，用于指定模型运行的设备，默认为"-1"表示使用CPU。如果指定为GPU，则为GPU的ID。
+ - **quantize (bool, optional):** 是否使用量化模型，默认为False。
+ - **intra_op_num_threads (int, optional):** ONNX Runtime的线程数，默认为4。
+ - **max_end_sil (int, optional):** 最大静默结束时间，如果未指定，则使用模型配置中的默认值。
+
+> **def `__call__`(self, audio_in: Union[np.ndarray, List[np.ndarray]]) -> List:**
+
+**参数：**
+
+ - **audio_in (Union[np.ndarray, List[np.ndarray]]):** 输入音频数据，可以是单个numpy数组或numpy数组列表，采样率为16000
+
+**返回：**
+
+ - List: 返回结构为[[开始, 结束],[开始, 结束]...]，如果是-1，则包含该位置，如果为[]，没有检测到活动事件，单位毫秒
+
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+from yeaudio.vad_model import VadModel
+
+vad_model = VadModel()
+audio_segment = AudioSegment.from_file("data/test_long.wav")
+audio_segment.resample(target_sample_rate=vad_model.sample_rate)
+samples = audio_segment.samples
+
+speech_timestamps = vad_model(samples)
+for speech_timestamp in speech_timestamps:
+    print(speech_timestamp)
+```
+
+
+## VadOnlineModel
+
+
+语音活动检测模型，在线，或者叫流式
+
+> **def `__init__`(self,
+                   batch_size: int = 1,
+                   device_id: Union[str, int] = "-1",
+                   quantize: bool = True,
+                   intra_op_num_threads: int = 4,
+                   max_end_sil: int = None):**
+
+**参数：**
+
+ - **batch_size (int, optional):** 批处理大小，默认为1。
+ - **device_id (Union[str, int], optional):** 设备ID，用于指定模型运行的设备，默认为"-1"表示使用CPU。如果指定为GPU，则为GPU的ID。
+ - **quantize (bool, optional):** 是否使用量化模型，默认为False。
+ - **intra_op_num_threads (int, optional):** ONNX Runtime的线程数，默认为4。
+ - **max_end_sil (int, optional):** 最大静默结束时间，如果未指定，则使用模型配置中的默认值。
+
+> **def `__call__`(self, audio_in: np.ndarray) -> List:**
+
+**参数：**
+
+ - **audio_in (np.ndarray):** 输入音频数据，采样率为16000
+
+**返回：**
+
+ - List: 返回结构为[[开始, 结束],[开始, 结束]...]，如果是-1，则包含该位置，如果为[]，没有检测到活动事件，单位毫秒
+
+
+**示例代码：**
+
+```python
+from yeaudio.audio import AudioSegment
+from yeaudio.vad_model import VadOnlineModel
+
+vad_model = VadOnlineModel()
+
+audio_segment = AudioSegment.from_file('data/test_long.wav')
+audio_segment.resample(target_sample_rate=vad_model.sample_rate)
+samples = audio_segment.samples
+
+speech_length = len(samples)
+step = 16000
+param_dict = {"in_cache": []}
+for sample_offset in range(0, speech_length, step):
+    is_final = True if sample_offset + step >= speech_length - 1 else False
+    data = samples[sample_offset:sample_offset + step]
+    param_dict["is_final"] = is_final
+    segments_result = vad_model(audio_in=data, param_dict=param_dict)
+    if len(segments_result) > 0:
+        print("segments_result", segments_result)
+
+```
 
 ## SpeedPerturbAugmentor
 
@@ -1085,44 +1189,3 @@ print(audio_segment.rms_db)
  - **x：** 音频特征，维度(time, freq)
 
 <br/>
-
----
-
-## StreamingVAD
-
-流式语音活动（VAD）检测器
-
-> **def `__init__`(self, sample_rate: int = 16000, num_channels: int = 1, params: VADParams = VADParams()):**
-
-**参数：**
-
- - **sample_rate（int）：** 音频的采样率
- - **num_channels（int）：** 音频的通道数
- - **params（VADParams）：** VAD参数
-
-> **def `__call__`(self, buffer: Union[bytes, np.ndarray]) -> VADState:**
-
-**参数：**
-
- - **buffer（Union[bytes, np.ndarray]）：** 输入的音频，小于等于vad_frames的长度或者vad_frames_num_bytes的字节长度
-
-**返回：**
-
- - `VADState`：识别结果
-
-**示例代码：**
-
-```python
-from yeaudio.audio import AudioSegment
-from yeaudio.streaming_vad import StreamingVAD
-
-audio_seg = AudioSegment.from_file('data/test.wav')
-data = audio_seg.samples
-
-streaming_vad = StreamingVAD(sample_rate=audio_seg.sample_rate)
-
-for ith_frame in range(0, len(data), streaming_vad.vad_frames):
-    buffer = data[ith_frame:ith_frame + streaming_vad.vad_frames]
-    state = streaming_vad(buffer)
-    print("VAD state:", state)
-```

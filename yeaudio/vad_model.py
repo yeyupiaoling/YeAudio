@@ -25,8 +25,16 @@ class VadModel:
             intra_op_num_threads: int = 4,
             max_end_sil: int = None,
     ):
+        """VAD（语音检测活动检测）模型
 
-        model_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'vad_models/')
+        Args:
+            batch_size (int, optional): 批处理大小，默认为1。
+            device_id (Union[str, int], optional): 设备ID，用于指定模型运行的设备，默认为"-1"表示使用CPU。如果指定为GPU，则为GPU的ID。
+            quantize (bool, optional): 是否使用量化模型，默认为False。
+            intra_op_num_threads (int, optional): ONNX Runtime的线程数，默认为4。
+            max_end_sil (int, optional): 最大静默结束时间，如果未指定，则使用模型配置中的默认值。
+        """
+        model_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils/vad_models/')
         model_file = os.path.join(model_dir, "model.onnx")
         if quantize:
             model_file = os.path.join(model_dir, "model_quant.onnx")
@@ -54,6 +62,14 @@ class VadModel:
         return in_cache
 
     def __call__(self, audio_in: Union[np.ndarray, List[np.ndarray]], **kwargs) -> List:
+        """
+        调用对象实例
+        Args:
+            audio_in (Union[np.ndarray, List[np.ndarray]]): 输入音频数据，可以是单个numpy数组或numpy数组列表，采样率为16000
+            **kwargs: 其他关键字参数
+        Returns:
+            List: 返回结构为[[开始, 结束],[开始, 结束]...]，单位毫秒
+        """
         if not isinstance(audio_in, list):
             waveform_list = [audio_in]
         else:
@@ -128,7 +144,6 @@ class VadModel:
         return feats
 
     def infer(self, feats: List) -> Tuple[np.ndarray, np.ndarray]:
-
         outputs = self.ort_infer(feats)
         scores, out_caches = outputs[0], outputs[1:]
         return scores, out_caches
@@ -146,8 +161,17 @@ class VadOnlineModel:
                  device_id: Union[str, int] = "-1",
                  quantize: bool = True,
                  intra_op_num_threads: int = 4,
-                 max_end_sil: int = None, ):
-        model_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'vad_models/')
+                 max_end_sil: int = None):
+        """VAD（语音检测活动检测）模型，流式识别
+
+        Args:
+            batch_size (int, optional): 批处理大小，默认为1。
+            device_id (Union[str, int], optional): 设备ID，用于指定模型运行的设备，默认为"-1"表示使用CPU。如果指定为GPU，则为GPU的ID。
+            quantize (bool, optional): 是否使用量化模型，默认为False。
+            intra_op_num_threads (int, optional): ONNX Runtime的线程数，默认为4。
+            max_end_sil (int, optional): 最大静默结束时间，如果未指定，则使用模型配置中的默认值。
+        """
+        model_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'utils/vad_models/')
         model_file = os.path.join(model_dir, "model.onnx")
         if quantize:
             model_file = os.path.join(model_dir, "model_quant.onnx")
@@ -175,6 +199,14 @@ class VadOnlineModel:
         return in_cache
 
     def __call__(self, audio_in: np.ndarray, **kwargs) -> List:
+        """
+        调用对象实例
+        Args:
+            audio_in (np.ndarray): 输入音频数据，采样率为16000
+            **kwargs: 其他关键字参数
+        Returns:
+            List: 返回结构为[[开始, 结束],[开始, 结束]...]，如果是-1，则包含该位置，如果为[]，没有检测到活动事件，单位毫秒
+        """
         waveforms = np.expand_dims(audio_in, axis=0)
 
         param_dict = kwargs.get("param_dict", dict())
@@ -191,9 +223,9 @@ class VadOnlineModel:
                 param_dict["in_cache"] = out_caches
                 waveforms = self.frontend.get_waveforms()
                 segments = self.vad_scorer(
-                    scores, waveforms, is_final=is_final, max_end_sil=self.max_end_sil, online=True
-                )
-
+                    scores, waveforms, is_final=is_final, max_end_sil=self.max_end_sil, online=True)
+                if len(segments) > 0:
+                    segments = segments[0]
             except ONNXRuntimeError:
                 logger.exception("input wav is silence or noise")
                 segments = []
@@ -203,7 +235,6 @@ class VadOnlineModel:
         waveforms_lens = np.zeros(waveforms.shape[0]).astype(np.int32)
         for idx, waveform in enumerate(waveforms):
             waveforms_lens[idx] = waveform.shape[-1]
-
         feats, feats_len = self.frontend.extract_fbank(waveforms, waveforms_lens, is_final)
         return feats.astype(np.float32), feats_len.astype(np.int32)
 
