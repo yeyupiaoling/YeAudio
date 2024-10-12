@@ -4,7 +4,6 @@ import io
 import os
 import random
 from typing import List, Dict
-from loguru import logger
 
 import numpy as np
 import resampy
@@ -495,20 +494,15 @@ class AudioSegment(object):
 
         :param return_seconds: 指示是否返回秒数而不是样本索引
         :type return_seconds: bool
-        :param kwargs: 传递给Silero VAD模型的参数
+        :param kwargs: 传递给VAD模型的参数
         :type kwargs: dict
         :return: 语音活动时间戳列表
         :rtype: List[Dict]
         """
-        try:
-            from funasr_onnx import Fsmn_vad
-        except ImportError as e:
-            if 'funasr_onnx' in str(e):
-                raise ImportError("请执行命令安装所需的依赖库：pip install -U funasr-onnx modelscope funasr")
-            raise e
         if self.vad_model is None:
-            self.vad_model = Fsmn_vad("damo/speech_fsmn_vad_zh-cn-16k-common-pytorch")
-        speech_timestamps = self.vad_model(self.samples, fs=self.sample_rate, is_final=True)[0]
+            from yeaudio.utils.vad_model import VadModel
+            self.vad_model = VadModel(**kwargs)
+        speech_timestamps = self.vad_model(self.samples)[0]
         results = []
         if not return_seconds:
             for timestamp in speech_timestamps:

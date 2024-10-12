@@ -785,7 +785,7 @@ print(audio_segment.samples)
 
 > **def vad(self, return_seconds=False, \*\*kwargs):**
 
-创建给定持续时间和采样率的静音音频段，在使用之前需要安装`pip install -U funasr-onnx modelscope funasr`相关依赖库。
+创建给定持续时间和采样率的静音音频段。
 
 **参数：**
 

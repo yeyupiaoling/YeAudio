@@ -21,7 +21,7 @@ if __name__ == "__main__":
     setup(
         name='yeaudio',
         packages=find_packages(),
-        package_data={'': ['utils/silero_vad.onnx']},
+        package_data={'': ['utils/vad_models/*']},
         author='yeyupiaoling',
         version=VERSION,
         install_requires=parse_requirements(),
