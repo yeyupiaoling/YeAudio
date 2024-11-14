@@ -5,7 +5,7 @@ import random
 
 import numpy as np
 from PIL import Image
-from PIL.Image import BICUBIC
+from PIL.Image import Resampling
 from loguru import logger
 from yeaudio.audio import AudioSegment
 
@@ -242,8 +242,8 @@ class SpecAugmentor(object):
         # NOTE: randrange(a, b) emits a, a + 1, ..., b - 1
         center = random.randrange(window, t - window)
         warped = random.randrange(center - window, center + window) + 1  # 1 ... t - 1
-        left = Image.fromarray(x[:center]).resize((x.shape[1], warped), BICUBIC)
-        right = Image.fromarray(x[center:]).resize((x.shape[1], t - warped), BICUBIC)
+        left = Image.fromarray(x[:center]).resize((x.shape[1], warped), Resampling.BICUBIC)
+        right = Image.fromarray(x[center:]).resize((x.shape[1], t - warped), Resampling.BICUBIC)
         if self.inplace:
             x[:warped] = left
             x[warped:] = right
