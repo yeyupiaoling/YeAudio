@@ -2,7 +2,7 @@ numpy>=1.19.2
 resampy>=0.2.2
 soundfile>=0.12.1
 av>=10.0.0
-scipy>=1.13.0
+scipy>=1.6.3
 pillow>=10.0.1
 loguru>=0.7.2
 kaldi-native-fbank
