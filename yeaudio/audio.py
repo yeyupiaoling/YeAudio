@@ -66,7 +66,8 @@ class AudioSegment(object):
         :return: 音频片段实例
         :rtype: AudioSegment
         """
-        assert os.path.exists(file), f'文件不存在，请检查路径：{file}'
+        if isinstance(file, str):
+            assert os.path.exists(file), f'文件不存在，请检查路径：{file}'
         try:
             samples, sample_rate = soundfile.read(file, dtype='float32')
         except:
@@ -239,7 +240,7 @@ class AudioSegment(object):
         :rtype: bytes
         """
         samples = self._convert_samples_from_float32(self._samples, dtype)
-        return samples.tostring()
+        return samples.tobytes()
 
     def to_pcm_bytes(self):
         """创建pcm格式的字节
